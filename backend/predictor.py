@@ -1,12 +1,11 @@
 # ===================================================================
 # HMPI Predictor from Lat/Lon (Auto Feature Engineering with Fallbacks)
-# Author: Rishi
+# Author: Rishi + Updated to Class-based OOP
 # ===================================================================
 
 import requests
 import joblib
 import pandas as pd
-import numpy as np
 from shapely.geometry import Point
 import rasterio
 
@@ -26,9 +25,9 @@ DEFAULTS = {
 }
 
 # -------------------------------
-# API utility functions (safe)
+# Utility Functions (internal)
 # -------------------------------
-def get_nearest_distance(lat, lon, query, fallback_key):
+def _get_nearest_distance(lat, lon, query, fallback_key):
     try:
         url = "http://overpass-api.de/api/interpreter"
         r = requests.get(url, params={"data": query}, timeout=15)
@@ -45,7 +44,7 @@ def get_nearest_distance(lat, lon, query, fallback_key):
     except Exception:
         return DEFAULTS[fallback_key]
 
-def get_elevation(lat, lon):
+def _get_elevation(lat, lon):
     try:
         url = f"https://api.open-elevation.com/api/v1/lookup?locations={lat},{lon}"
         r = requests.get(url, timeout=10).json()
@@ -53,7 +52,7 @@ def get_elevation(lat, lon):
     except Exception:
         return DEFAULTS["elevation_m"]
 
-def get_rainfall(lat, lon):
+def _get_rainfall(lat, lon):
     try:
         url = f"https://power.larc.nasa.gov/api/temporal/climatology/point?parameters=PRECTOT&community=AG&longitude={lon}&latitude={lat}&format=JSON"
         r = requests.get(url, timeout=15).json()
@@ -61,7 +60,7 @@ def get_rainfall(lat, lon):
     except Exception:
         return DEFAULTS["annual_precip_mm"]
 
-def get_population_density(lat, lon, raster_path="data/worldpop_density.tif"):
+def _get_population_density(lat, lon, raster_path="data/worldpop_density.tif"):
     try:
         with rasterio.open(raster_path) as src:
             for val in src.sample([(lon, lat)]):
@@ -70,58 +69,61 @@ def get_population_density(lat, lon, raster_path="data/worldpop_density.tif"):
         return DEFAULTS["population_density_per_km2"]
 
 # -------------------------------
-# Feature builder
+# Class-based Predictor
 # -------------------------------
-def build_features(lat, lon, feature_columns):
-    features = {
-        "latitude": lat,
-        "longitude": lon,
-        "dist_to_nearest_industrial_area_km": get_nearest_distance(lat, lon, """
-            area["ISO3166-1"="IN"][admin_level=2];
-            (way["landuse"="industrial"](area););
-            out center;
-        """, "dist_to_nearest_industrial_area_km"),
-        "dist_to_nearest_drain_outfall_km": get_nearest_distance(lat, lon, """
-            area["ISO3166-1"="IN"][admin_level=2];
-            (way["waterway"="drain"](area););
-            out center;
-        """, "dist_to_nearest_drain_outfall_km"),
-        "dist_to_nearest_landfill_km": get_nearest_distance(lat, lon, """
-            area["ISO3166-1"="IN"][admin_level=2];
-            (way["landuse"="landfill"](area););
-            out center;
-        """, "dist_to_nearest_landfill_km"),
-        "dist_to_nearest_major_highway_km": get_nearest_distance(lat, lon, """
-            area["ISO3166-1"="IN"][admin_level=2];
-            (way["highway"~"motorway|trunk|primary"](area););
-            out center;
-        """, "dist_to_nearest_major_highway_km"),
-        "annual_precip_mm": get_rainfall(lat, lon),
-        "population_density_per_km2": get_population_density(lat, lon),
-        "elevation_m": get_elevation(lat, lon),
-        "land_use_category_estuary": DEFAULTS["land_use_category_estuary"],
-        "soil_type_clay": DEFAULTS["soil_type_clay"]
-    }
+class HMPIPredictor:
+    def __init__(self, model_path, columns_path):
+        self.model = joblib.load(model_path)
+        self.feature_columns = joblib.load(columns_path)
 
-    df = pd.DataFrame([features])
-    # Align with training feature columns
-    for col in feature_columns:
-        if col not in df.columns:
-            df[col] = 0
-    return df[feature_columns]
+    def build_features(self, lat, lon):
+        features = {
+            "latitude": lat,
+            "longitude": lon,
+            "dist_to_nearest_industrial_area_km": _get_nearest_distance(lat, lon, """
+                area["ISO3166-1"="IN"][admin_level=2];
+                (way["landuse"="industrial"](area););
+                out center;
+            """, "dist_to_nearest_industrial_area_km"),
+            "dist_to_nearest_drain_outfall_km": _get_nearest_distance(lat, lon, """
+                area["ISO3166-1"="IN"][admin_level=2];
+                (way["waterway"="drain"](area););
+                out center;
+            """, "dist_to_nearest_drain_outfall_km"),
+            "dist_to_nearest_landfill_km": _get_nearest_distance(lat, lon, """
+                area["ISO3166-1"="IN"][admin_level=2];
+                (way["landuse"="landfill"](area););
+                out center;
+            """, "dist_to_nearest_landfill_km"),
+            "dist_to_nearest_major_highway_km": _get_nearest_distance(lat, lon, """
+                area["ISO3166-1"="IN"][admin_level=2];
+                (way["highway"~"motorway|trunk|primary"](area););
+                out center;
+            """, "dist_to_nearest_major_highway_km"),
+            "annual_precip_mm": _get_rainfall(lat, lon),
+            "population_density_per_km2": _get_population_density(lat, lon),
+            "elevation_m": _get_elevation(lat, lon),
+            "land_use_category_estuary": DEFAULTS["land_use_category_estuary"],
+            "soil_type_clay": DEFAULTS["soil_type_clay"]
+        }
+
+        df = pd.DataFrame([features])
+        # Align with training feature columns
+        for col in self.feature_columns:
+            if col not in df.columns:
+                df[col] = 0
+        return df[self.feature_columns]
+
+    def get_prediction(self, lat, lon):
+        X = self.build_features(lat, lon)
+        return round(float(self.model.predict(X)[0]), 2)
+
 
 # -------------------------------
-# Prediction function
-# -------------------------------
-def predict_hmpi(lat, lon):
-    model = joblib.load("model/hmpi_predictor_model.pkl")
-    feature_columns = joblib.load("model/model_feature_columns.pkl")
-    X = build_features(lat, lon, feature_columns)
-    return model.predict(X)[0]
-
-# -------------------------------
-# Example run
+# Example run (for testing standalone)
 # -------------------------------
 if __name__ == "__main__":
-    lat, lon = 28.6, 77.2  # Delhi
-    print("Predicted HMPI:", predict_hmpi(lat, lon))
+    MODEL_FILE = "model/hmpi_predictor_model.pkl"
+    COLUMNS_FILE = "model/model_feature_columns.pkl"
+    predictor = HMPIPredictor(MODEL_FILE, COLUMNS_FILE)
+    print("Predicted HMPI for Delhi:", predictor.get_prediction(28.6, 77.2))

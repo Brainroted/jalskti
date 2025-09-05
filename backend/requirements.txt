@@ -1,1 +1,10 @@
+flask
+requests
+pandas
+numpy
+joblib
+shapely
+rasterio
+gunicorn
+
 

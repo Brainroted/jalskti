@@ -1,10 +1,8 @@
-flask
-requests
+Flask
+flask-cors
+joblib
 pandas
 numpy
-joblib
 shapely
 rasterio
-gunicorn
-
-
+requests

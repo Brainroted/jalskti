@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: rtwqms-backend
+    env: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn app:app --chdir backend --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHONPATH
+        value: backend

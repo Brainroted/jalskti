@@ -6,3 +6,4 @@ numpy
 shapely
 rasterio
 requests
+gunicorn

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - RTWQMS-Plus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="absolute top-0 left-0 right-0 z-10 p-2">
+        <div class="bg-white text-gray-800 shadow-md rounded-lg relative">
+            <div class="absolute top-0 left-0 w-full h-1 bg-orange-500 rounded-t-lg"></div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-green-600 rounded-b-lg"></div>
+            <div class="flex items-center justify-between p-3">
+                <div class="flex items-center space-x-4">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India" class="h-16">
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-indigo-900">जल गुणवत्ता निगरानी पोर्टल</h1>
+                        <p class="text-base md:text-lg text-gray-700 font-medium">Water Quality Monitoring Portal</p>
+                        <p class="text-sm md:text-md text-gray-600">Government of India</p>
+                    </div>
+                </div>
+                <!-- CPCB Logo Centered
+                <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <img src="./assets/img/cpcb_logo.png" alt="CPCB Logo" class="h-20">
+                </div> -->
+                <!-- 79th Independence Logo on the right -->
+                <div class="flex items-center justify-center">
+                    <img src="./assets/img/79_indp.png" alt="79th Independence Logo" class="h-20 md:h-24">
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <div class="min-h-screen flex items-center justify-center px-4 pt-48">
+        <div class="w-full max-w-md">
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="text-center mb-8">
+                    <img src="./assets/img/cpcb_logo.png" alt="CPCB Logo" class="h-20 mx-auto mb-4">
+                    <h1 class="text-3xl font-bold text-blue-800">Real time water quality monitoring system</h1>
+                    <p class="text-orange-600 mt-2 font-semibold">For Government Officials Only</p>
+                </div>
+                <form id="login-form" onsubmit="return false;">
+                    <div class="mb-4">
+                        <label for="username" class="block text-gray-600 text-sm font-medium mb-2">Username</label>
+                        <input type="text" id="username" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., cpcb_official">
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="block text-gray-600 text-sm font-medium mb-2">Password</label>
+                        <input type="password" id="password" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                    </div>
+                    <div class="mb-6">
+                        <label for="role" class="block text-gray-600 text-sm font-medium mb-2">Select Role</label>
+                        <select id="role" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option>Government Official</option>
+                            <option>Technician</option>
+                            <option>Viewer</option>
+                        </select>
+                    </div>
+                    <button type="button" id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
+                        Login
+                    </button>
+                    <div class="mt-4 text-center">
+                        <a href="dataentry.html" class="inline-block w-full text-sm text-blue-600 hover:text-blue-500 bg-gray-200 hover:bg-gray-300 font-semibold py-3 px-4 rounded-lg transition duration-300">
+                            Skip & View Demo
+                        </a>
+                    </div>
+                </form>
+            </div>
+             <p class="text-center text-gray-500 text-xs mt-8">
+                &copy;2025 CPCB Hackathon Entry. All rights reserved.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-btn').addEventListener('click', function() {
+            window.location.href = 'dataentry.html'; // Redirect to the dashboard
+        });
+    </script>
+</body>
+</html>
+
+

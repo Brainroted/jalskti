@@ -1,12 +1,12 @@
 # ===================================================================
 # Main Flask Application for RTWQMS-Plus
-# Author: Gemini + Updated
+# Author: Gemini + Updated for Railway Deploy
 # Description: Serves HTML pages + API for HMPI prediction using lat/lon only.
 # ===================================================================
 
 from flask import Flask, request, jsonify, render_template
 import os
-from predictor import HMPIPredictor   # <-- yahan tumhara predictor.py import ho raha hai
+from predictor import HMPIPredictor
 
 # ------------------------------------
 # 1. App Initialization
@@ -57,11 +57,6 @@ def route_station():
 # ------------------------------------
 @app.route('/api/predict', methods=['POST'])
 def predict_hmpi():
-    """
-    Receives latitude & longitude only,
-    runs the full feature engineering pipeline,
-    and returns the predicted HMPI.
-    """
     if predictor is None:
         return jsonify({'error': 'Predictor pipeline not available on server.'}), 500
 
@@ -72,8 +67,6 @@ def predict_hmpi():
 
         lat = float(data["latitude"])
         lon = float(data["longitude"])
-
-        # Run prediction pipeline
         predicted_hmpi = predictor.get_prediction(lat, lon)
 
         return jsonify({
@@ -89,4 +82,5 @@ def predict_hmpi():
 # 5. Main Execution
 # ------------------------------------
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Railway sets PORT automatically
+    app.run(host='0.0.0.0', port=port)

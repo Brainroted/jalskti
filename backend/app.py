@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
-from flask_cors import CORS  
+from flask_cors import CORS
 import os
 from predictor import HMPIPredictor
 
@@ -11,6 +11,7 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, '..', 'templates')  # parent folder
 STATIC_DIR = os.path.join(BASE_DIR, '..', 'assets')      # parent folder
 
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
+CORS(app)  # Enable CORS for all routes
 app.secret_key = "supersecretkey"  # session ke liye zaruri
 
 # -----------------------------
@@ -35,7 +36,6 @@ def route_index():
         username = request.form.get("username")
         password = request.form.get("password")
 
-        # Dummy check (yahan DB/CSV ke saath bhi check kar sakte ho)
         if username == "admin" and password == "1234":
             session["user"] = username
             return redirect(url_for("route_dashboard"))

@@ -12,7 +12,7 @@ STATIC_DIR = os.path.join(BASE_DIR, '..', 'assets')      # parent folder
 
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 CORS(app)  # Enable CORS for all routes
-app.secret_key = "supersecretkey"  # session ke liye zaruri
+app.secret_key = "supersecretkey"
 
 # -----------------------------
 # Load Predictor Pipeline
@@ -21,6 +21,8 @@ MODEL_FILE = os.path.join(BASE_DIR, 'model', 'hmpi_predictor_model.pkl')
 COLUMNS_FILE = os.path.join(BASE_DIR, 'model', 'model_feature_columns.pkl')
 
 try:
+    if not os.path.exists(MODEL_FILE) or not os.path.exists(COLUMNS_FILE):
+        raise FileNotFoundError("Model or columns file not found!")
     predictor = HMPIPredictor(MODEL_FILE, COLUMNS_FILE)
     print("✅ Predictor pipeline loaded successfully.")
 except Exception as e:
@@ -42,7 +44,7 @@ def route_index():
         else:
             return render_template("index.html", error="❌ Invalid credentials")
 
-    return render_template("index.html")  # login form
+    return render_template("index.html")
 
 @app.route('/dashboard')
 def route_dashboard():
@@ -100,4 +102,5 @@ def predict_hmpi():
 # -----------------------------
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
+    print(f"🚀 Starting Flask app on port {port}")
     app.run(host='0.0.0.0', port=port)

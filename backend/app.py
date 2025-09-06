@@ -86,17 +86,26 @@ def predict_hmpi():
         data = request.get_json()
         if not data or "latitude" not in data or "longitude" not in data:
             return jsonify({'error': 'Missing latitude or longitude in request.'}), 400
+        
         lat = float(data["latitude"])
         lon = float(data["longitude"])
+        
         predicted_hmpi = predictor.get_prediction(lat, lon)
+        
+        # --- FIX: Added 'critical_factor' to the response ---
+        # NOTE: This is a placeholder as the model doesn't output a critical factor.
+        # In a real-world scenario, you might use model interpretation (e.g., SHAP)
+        # or rule-based logic to determine the most influential feature.
+        critical_factor = "Proximity to Industrial Area" if predicted_hmpi > 50 else "High Population Density"
+
         return jsonify({
             'latitude': lat,
             'longitude': lon,
-            'predicted_hmpi': predicted_hmpi
+            'predicted_hmpi': predicted_hmpi,
+            'critical_factor': critical_factor  # Added this line
         })
     except Exception as e:
         return jsonify({'error': f"Prediction failed: {str(e)}"}), 500
-
 # -----------------------------
 # Main Execution
 # -----------------------------

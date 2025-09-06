@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for, s
 from flask_cors import CORS
 import os
 from predictor import HMPIPredictor
-
+import traceback
 # -----------------------------
 # Absolute paths for templates & assets
 # -----------------------------
@@ -26,9 +26,9 @@ try:
     predictor = HMPIPredictor(MODEL_FILE, COLUMNS_FILE)
     print("✅ Predictor pipeline loaded successfully.")
 except Exception as e:
-    print(f"❌ Error loading predictor: {e}")
+    print(f"❌ Detailed error loading predictor:")
+    traceback.print_exc() # This will print the full error details
     predictor = None
-
 # -----------------------------
 # Login + HTML Routes
 # -----------------------------

@@ -2,13 +2,8 @@ services:
   - type: web
     name: rtwqms-backend
     env: python
-
-    # --- FIX: Added system dependency installation for rasterio ---
-    # The '|' allows for a multi-line script.
-    # This now installs GDAL before installing your Python packages.
     buildCommand: |
       apt-get update && apt-get install -y libgdal-dev --no-install-recommends
+      chmod -R a+r backend
       pip install -r backend/requirements.txt
-
-    # This start command is good and correctly changes into the backend directory.
     startCommand: gunicorn --chdir backend app:app

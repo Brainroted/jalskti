@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
+from flask_cors import CORS  
 import os
 from predictor import HMPIPredictor
 

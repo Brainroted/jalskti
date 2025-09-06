@@ -1,92 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - RTWQMS-Plus</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Data Entry - RTWQMS-Plus</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <nav class="w-64 bg-white p-5 flex flex-col justify-between shadow-lg">
-            <div>
-                <div class="flex items-center space-x-4 mb-10">
-                    <img src="{{ url_for('static', filename='img/cpcb_logo.png') }}" alt="CPCB Logo" class="h-12">
-                    <span class="text-xl font-bold text-blue-800">RTWQMS</span>
-                </div>
-                <ul>
-                    <li class="mb-4">
-                        <a href="{{ url_for('route_dashboard') }}" class="flex items-center p-3 bg-blue-100 rounded-lg text-blue-800 font-semibold">
-                            Dashboard
-                        </a>
-                    </li>
-                    <li class="mb-4">
-                        <a href="{{ url_for('route_station', id=1) }}" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
-                            Stations
-                        </a>
-                    </li>
-                    <li class="mb-4">
-                        <a href="{{ url_for('route_analytics') }}" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
-                            Analytics
-                        </a>
-                    </li>
-                    <li class="mb-4">
-                        <a href="{{ url_for('route_admin') }}" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
-                            Admin
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <a href="{{ url_for('route_index') }}" class="flex items-center p-3 hover:bg-red-50 text-red-600 rounded-lg transition">
-                Logout
+<body class="bg-gray-50 text-gray-900">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <nav class="w-64 bg-white shadow-lg flex flex-col justify-between p-5">
+      <div>
+        <div class="flex items-center space-x-3 mb-10">
+          <img src="{{ url_for('static', filename='img/cpcb_logo.png') }}" class="h-12" alt="Logo">
+          <span class="text-xl font-bold text-blue-800">RTWQMS</span>
+        </div>
+        <ul>
+          <li class="mb-4">
+            <a href="{{ url_for('route_dashboard') }}" class="flex items-center p-3 bg-blue-100 rounded-lg text-blue-800 font-semibold">
+              Dashboard
             </a>
-        </nav>
+          </li>
+          <li class="mb-4">
+            <a href="{{ url_for('route_station') }}" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg">
+              Stations
+            </a>
+          </li>
+          <li class="mb-4">
+            <a href="{{ url_for('route_analytics') }}" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg">
+              Analytics
+            </a>
+          </li>
+          <li class="mb-4">
+            <a href="{{ url_for('route_admin') }}" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg">
+              Admin
+            </a>
+          </li>
+        </ul>
+      </div>
+      <a href="{{ url_for('route_index') }}" class="flex items-center p-3 hover:bg-red-50 text-red-600 rounded-lg">Logout</a>
+    </nav>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-6 lg:p-8 overflow-y-auto custom-scrollbar">
-            <header class="bg-white text-gray-800 shadow-md rounded-lg mb-6 relative">
-                <div class="absolute top-0 left-0 w-full h-1 bg-orange-500 rounded-t-lg"></div>
-                <div class="absolute bottom-0 left-0 w-full h-1 bg-green-600 rounded-b-lg"></div>
-                <div class="flex items-center justify-between p-3">
-                    <div class="flex items-center space-x-4">
-                        <img src="{{ url_for('static', filename='img/emblem_india.svg') }}" alt="Emblem of India" class="h-16">
-                        <div>
-                            <h1 class="text-xl md:text-2xl font-bold text-indigo-900">जल गुणवत्ता निगरानी पोर्टल</h1>
-                            <p class="text-base md:text-lg text-gray-700 font-medium">Water Quality Monitoring Portal</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-center">
-                        <img src="{{ url_for('static', filename='img/79_indp.png') }}" alt="79th Independence Logo" class="h-20 md:h-24">
-                    </div>
-                </div>
-            </header>
-
-            <h1 class="text-3xl font-bold text-blue-900 mb-6">Dashboard</h1>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
-                    <h2 class="text-lg font-semibold text-gray-800">Sensor Overview</h2>
-                    <p class="mt-2 text-gray-600">View all sensors and their health status.</p>
-                </div>
-                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
-                    <h2 class="text-lg font-semibold text-gray-800">Data Entry</h2>
-                    <p class="mt-2 text-gray-600">Enter new measurements for stations.</p>
-                </div>
-                <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
-                    <h2 class="text-lg font-semibold text-gray-800">Reports</h2>
-                    <p class="mt-2 text-gray-600">Generate analytical reports for monitoring.</p>
-                </div>
+    <!-- Main -->
+    <main class="flex-1 p-6 lg:p-8 overflow-y-auto">
+      <!-- Header -->
+      <header class="bg-white shadow-md rounded-lg mb-6 relative">
+        <div class="absolute top-0 left-0 w-full h-1 bg-orange-500 rounded-t-lg"></div>
+        <div class="absolute bottom-0 left-0 w-full h-1 bg-green-600 rounded-b-lg"></div>
+        <div class="flex items-center justify-between p-3">
+          <div class="flex items-center space-x-4">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" class="h-16" alt="Emblem">
+            <div>
+              <h1 class="text-xl md:text-2xl font-bold text-indigo-900">जल गुणवत्ता निगरानी पोर्टल</h1>
+              <p class="text-base md:text-lg text-gray-700">Water Quality Monitoring Portal</p>
+              <p class="text-sm md:text-md text-gray-600">Government of India</p>
             </div>
-        </main>
-    </div>
+          </div>
+          <img src="{{ url_for('static', filename='img/79_indp.png') }}" class="h-20 md:h-24" alt="79th Independence Logo">
+        </div>
+      </header>
 
-</body>
-</html>
+      <!-- Form -->
+      <section class="bg-white p-6 rounded-xl shadow-md">
+        <h2 class="text-2xl font-bold text-blue-900 mb-4">Enter Coordinates for Prediction</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block mb-2 font-semibold">Latitude</label>
+            <input id="latitude" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"/>
+          </div>
+          <div>
+            <label class="block mb-2 font-semibold">Longitude</label>
+            <input id="longitude" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"/>
+          </div>
+        </div>
+
+        <div class="mt-6 flex items-center space-x-4">
+          <button id="getLocationBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg">
+            Use Current Location
+          </button>
+          <button id="generatePredictionBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg">
+            Predict HMPI
+          </button>
+        </div>
+
+        <!-- Loader -->
+        <div id="predictionLoader" class="mt-4 hidden text-blue-600">⏳ Generating prediction...</div>
+
+        <!-- Result -->
+        <div id="predictionResultCard" class="mt-6 hidden bg-green-50 border border-green-200 p-4 rounded-lg">
+          <h3 class="font-semibold text-green-800">Predicted HMPI</h3>
+          <p class="text-2xl font-bold text-green-900" id="predictedHmpiValue">--</p>
+          <p class="text-sm text-green-700">Critical Factor: <span id="predictedCriticalFactor">--</span></p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const latInput = document.getElementById("latitude");
+    const lonInput = document.getElementById("longitude");
+    const getLocationBtn = document.getElementById("getLocationBtn");
+    const predictBtn = document.getElementById("generatePredictionBtn");
+    const loader = document.getElementById("predictionLoader");
+    const resultCard = document.getElementById("predictionResultCard");
+    const resultValue = document.getElementById("predictedHmpiValue");
+    const resultFactor = document.getElementById("predictedCriticalFactor");
+
+    // Get user GPS location
+    getLocationBtn.addEventListener("click", () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          latInput.value = pos.coords.latitude.toFixed(6);
+          lonInput.value = pos.coords.longitude.toFixed(6);
+        }, err => {
+          aler

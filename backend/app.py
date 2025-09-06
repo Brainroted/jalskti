@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 import os
 from predictor import HMPIPredictor
 
@@ -10,6 +10,7 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, '..', 'templates')  # parent folder
 STATIC_DIR = os.path.join(BASE_DIR, '..', 'assets')      # parent folder
 
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
+app.secret_key = "supersecretkey"  # session ke liye zaruri
 
 # -----------------------------
 # Load Predictor Pipeline
@@ -25,27 +26,51 @@ except Exception as e:
     predictor = None
 
 # -----------------------------
-# HTML Routes
+# Login + HTML Routes
 # -----------------------------
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def route_index():
-    return render_template('index.html')
+    if request.method == 'POST':
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        # Dummy check (yahan DB/CSV ke saath bhi check kar sakte ho)
+        if username == "admin" and password == "1234":
+            session["user"] = username
+            return redirect(url_for("route_dashboard"))
+        else:
+            return render_template("index.html", error="❌ Invalid credentials")
+
+    return render_template("index.html")  # login form
 
 @app.route('/dashboard')
 def route_dashboard():
+    if "user" not in session:
+        return redirect(url_for("route_index"))
     return render_template('dataentry.html')
 
 @app.route('/analytics')
 def route_analytics():
+    if "user" not in session:
+        return redirect(url_for("route_index"))
     return render_template('analytics.html')
 
 @app.route('/admin')
 def route_admin():
+    if "user" not in session:
+        return redirect(url_for("route_index"))
     return render_template('admin.html')
 
 @app.route('/station')
 def route_station():
+    if "user" not in session:
+        return redirect(url_for("route_index"))
     return render_template('station.html')
+
+@app.route('/logout')
+def logout():
+    session.pop("user", None)
+    return redirect(url_for("route_index"))
 
 # -----------------------------
 # API Endpoint

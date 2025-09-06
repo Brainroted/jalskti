@@ -1,121 +1,474 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Data Entry - RTWQMS-Plus</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard & Data Entry - RTWQMS-Plus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Leaflet.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .map-container {
+            height: 350px;
+            width: 100%;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0; /* gray-200 */
+        }
+        #csv-preview-table th, #csv-preview-table td {
+            min-width: 100px;
+        }
+        .invalid-row { background-color: #fee2e2; } /* red-100 */
+         /* Hide number input spinners */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        /* Make the light map tiles more visible by inverting colors */
+        .leaflet-tile-pane {
+             filter: invert(1) grayscale(1) brightness(1.1);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
-  <div class="flex h-screen">
-    <!-- Sidebar -->
-    <nav class="w-64 bg-white shadow-lg flex flex-col justify-between p-5">
-      <div>
-        <div class="flex items-center space-x-3 mb-10">
-          <img src="{{ url_for('static', filename='img/cpcb_logo.png') }}" class="h-12" alt="Logo">
-          <span class="text-xl font-bold text-blue-800">RTWQMS</span>
-        </div>
-        <ul>
-          <li class="mb-4">
-            <a href="{{ url_for('route_dashboard') }}" class="flex items-center p-3 bg-blue-100 rounded-lg text-blue-800 font-semibold">
-              Dashboard
-            </a>
-          </li>
-          <li class="mb-4">
-            <a href="{{ url_for('route_station') }}" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg">
-              Stations
-            </a>
-          </li>
-          <li class="mb-4">
-            <a href="{{ url_for('route_analytics') }}" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg">
-              Analytics
-            </a>
-          </li>
-          <li class="mb-4">
-            <a href="{{ url_for('route_admin') }}" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg">
-              Admin
-            </a>
-          </li>
-        </ul>
-      </div>
-      <a href="{{ url_for('route_index') }}" class="flex items-center p-3 hover:bg-red-50 text-red-600 rounded-lg">Logout</a>
-    </nav>
-
-    <!-- Main -->
-    <main class="flex-1 p-6 lg:p-8 overflow-y-auto">
-      <!-- Header -->
-      <header class="bg-white shadow-md rounded-lg mb-6 relative">
-        <div class="absolute top-0 left-0 w-full h-1 bg-orange-500 rounded-t-lg"></div>
-        <div class="absolute bottom-0 left-0 w-full h-1 bg-green-600 rounded-b-lg"></div>
-        <div class="flex items-center justify-between p-3">
-          <div class="flex items-center space-x-4">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" class="h-16" alt="Emblem">
+<body class="bg-gray-50 text-gray-800">
+    <div class="flex flex-col md:flex-row">
+        <!-- Sidebar Navigation -->
+        <nav class="w-full md:w-64 bg-white p-5 flex flex-col justify-between md:sticky md:top-0 md:h-screen shadow-lg">
             <div>
-              <h1 class="text-xl md:text-2xl font-bold text-indigo-900">जल गुणवत्ता निगरानी पोर्टल</h1>
-              <p class="text-base md:text-lg text-gray-700">Water Quality Monitoring Portal</p>
-              <p class="text-sm md:text-md text-gray-600">Government of India</p>
+                <div class="flex items-center space-x-4 mb-10">
+                    <img src="./assets/img/cpcb_logo.png" alt="CPCB Logo" class="h-12">
+                    <span class="text-xl font-bold text-blue-800">RTWQMS+</span>
+                </div>
+                <ul>
+                    <li class="mb-4"><a href="dataentry.html" class="flex items-center p-3 bg-blue-100 rounded-lg text-blue-800 font-semibold"><svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>Dashboard</a></li>
+                    <li class="mb-4"><a href="station.html?id=1" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"><svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>Stations</a></li>
+                    <li class="mb-4"><a href="analytics.html" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"><svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>Analytics</a></li>
+                    <li class="mb-4"><a href="admin.html" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"><svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0 -3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>Admin</a></li>
+                </ul>
             </div>
-          </div>
-          <img src="{{ url_for('static', filename='img/79_indp.png') }}" class="h-20 md:h-24" alt="79th Independence Logo">
-        </div>
-      </header>
+             <a href="index.html" class="flex items-center p-3 hover:bg-red-50 text-red-600 rounded-lg transition-colors">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Logout
+            </a>
+        </nav>
 
-      <!-- Form -->
-      <section class="bg-white p-6 rounded-xl shadow-md">
-        <h2 class="text-2xl font-bold text-blue-900 mb-4">Enter Coordinates for Prediction</h2>
+        <!-- Main Content -->
+        <main class="flex-1 p-6 overflow-y-auto">
+            <!-- Water Quality Monitoring Portal Header -->
+            <header class="bg-white text-gray-800 shadow-md rounded-lg mb-6 relative">
+                <div class="absolute top-0 left-0 w-full h-1 bg-orange-500 rounded-t-lg"></div>
+                <div class="absolute bottom-0 left-0 w-full h-1 bg-green-600 rounded-b-lg"></div>
+                <div class="flex items-center justify-between p-3">
+                    <div class="flex items-center space-x-4">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India" class="h-16">
+                        <div>
+                            <h1 class="text-xl md:text-2xl font-bold text-indigo-900">जल गुणवत्ता निगरानी पोर्टल</h1>
+                            <p class="text-base md:text-lg text-gray-700 font-medium">Water Quality Monitoring Portal</p>
+                            <p class="text-sm md:text-md text-gray-600">Government of India</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <img src="./assets/img/79_indp.png" alt="79th Independence Logo" class="h-20 md:h-24">
+                    </div>
+                </div>
+            </header>
+            <!-- End Header -->
+             <h1 class="text-3xl font-bold mb-6 text-blue-900">Dashboard & Data Submission</h1>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Left Column: Maps -->
+                <div class="bg-white p-6 rounded-xl shadow-md flex flex-col space-y-6">
+                    <div>
+                        <h2 class="text-xl font-bold mb-4 text-blue-800">Regional Map</h2>
+                        <div id="regionalMap" class="map-container"></div>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold mb-4 text-blue-800">Detailed Map</h2>
+                        <div id="detailMap" class="map-container"></div>
+                    </div>
+                </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label class="block mb-2 font-semibold">Latitude</label>
-            <input id="latitude" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"/>
-          </div>
-          <div>
-            <label class="block mb-2 font-semibold">Longitude</label>
-            <input id="longitude" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"/>
-          </div>
-        </div>
+                <!-- Right Column: Data Forms -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <form id="data-entry-form" class="space-y-8">
+                        <!-- Location Details -->
+                        <section>
+                            <h2 class="text-xl font-bold text-blue-800 border-b border-gray-200 pb-2">Location Details</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <label for="villageName" class="block text-gray-600 text-sm font-medium mb-2">Village Name</label>
+                                    <input type="text" id="villageName" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-2" placeholder="e.g., Rampur" required>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-600 text-sm font-medium mb-2">Get GPS Location</label>
+                                    <button type="button" id="getGpsBtn" class="w-full bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold py-2 px-4 rounded-lg transition flex items-center justify-center space-x-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
+                                        <span>Acquire Current Location</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <label for="latitude" class="block text-gray-600 text-sm font-medium mb-2">Latitude</label>
+                                    <input id="latitude" type="text" placeholder="Enter latitude manually" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-2" required>
+                                </div>
+                                <div>
+                                    <label for="longitude" class="block text-gray-600 text-sm font-medium mb-2">Longitude</label>
+                                    <input id="longitude" type="text" placeholder="Enter longitude manually" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-2" required>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <!-- ML Prediction Section -->
+                        <section>
+                            <h2 class="text-xl font-bold text-blue-800 border-b border-gray-200 pb-2">ML-Based Prediction</h2>
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-600 mb-3">Use our predictive model to get an instant HMPI estimate based on the acquired location and historical data.</p>
+                                <button type="button" id="generate-prediction-btn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition flex items-center justify-center space-x-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <span>Generate Prediction & Analytics</span>
+                                </button>
+                                <div id="prediction-loader" class="text-center mt-4 hidden">
+                                    <svg class="animate-spin h-6 w-6 text-teal-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <p class="text-sm text-gray-500 mt-2">Consulting prediction model...</p>
+                                </div>
+                                <div id="prediction-result-card" class="mt-4 p-4 rounded-lg hidden bg-teal-50 border border-teal-200">
+                                    <h4 class="font-bold text-lg text-teal-800">Prediction Result</h4>
+                                    <p class="font-semibold text-md text-gray-700">Predicted HMPI Value: <span id="predicted-hmpi-value" class="font-bold text-teal-900"></span></p>
+                                    <p class="font-semibold text-md text-gray-700">Most Probable Critical Factor: <span id="predicted-critical-factor" class="font-bold text-red-600"></span></p>
+                                </div>
+                            </div>
+                        </section>
 
-        <div class="mt-6 flex items-center space-x-4">
-          <button id="getLocationBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg">
-            Use Current Location
-          </button>
-          <button id="generatePredictionBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg">
-            Predict HMPI
-          </button>
-        </div>
+                        <!-- HPI Calculator -->
+                        <section>
+                            <h2 class="text-xl font-bold text-blue-800 border-b border-gray-200 pb-2">Manual HPI Calculator</h2>
+                             <p class="text-sm text-gray-600 my-3">Enter the concentrations of heavy metals in µg/L (micrograms per liter) to calculate the HPI value manually.</p>
+                            <div id="hpi-form" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                                <!-- JS will populate this -->
+                            </div>
+                             <button type="button" id="calculate-hpi-btn" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition">Calculate HPI</button>
+                            <div id="hpi-result-card" class="mt-4 p-4 rounded-lg hidden text-center text-white">
+                                <h4 class="font-bold text-lg">HPI Value: <span id="hpi-value"></span></h4>
+                                <p class="font-semibold text-md" id="hpi-interpretation"></p>
+                            </div>
+                        </section>
 
-        <!-- Loader -->
-        <div id="predictionLoader" class="mt-4 hidden text-blue-600">⏳ Generating prediction...</div>
+                         <!-- Proximity to Industry -->
+                        <section>
+                            <h2 class="text-xl font-bold text-blue-800 border-b border-gray-200 pb-2">Proximity to Industry</h2>
+                            <div class="flex items-center space-x-6 mt-4">
+                                <span class="text-gray-700 text-sm font-medium">Is there an industry nearby?</span>
+                                <div class="flex items-center">
+                                    <input type="radio" id="industryYes" name="industryNearby" value="yes" class="h-4 w-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
+                                    <label for="industryYes" class="ml-2 block text-sm text-gray-900">Yes</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="industryNo" name="industryNearby" value="no" checked class="h-4 w-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
+                                    <label for="industryNo" class="ml-2 block text-sm text-gray-900">No</label>
+                                </div>
+                            </div>
+                            <div id="industryDetails" class="hidden space-y-4 mt-4 pt-4 border-t border-gray-200 border-dashed">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="industryName" class="block text-gray-600 text-sm font-medium mb-2">Name of the Industry</label>
+                                        <input type="text" id="industryName" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-2" placeholder="e.g., ABC Chemicals">
+                                    </div>
+                                    <div>
+                                        <label for="industryType" class="block text-gray-600 text-sm font-medium mb-2">Type of Industry</label>
+                                        <select id="industryType" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-2">
+                                            <option value="">Select Type</option>
+                                            <option value="chemical">Chemical</option>
+                                            <option value="textile">Textile</option>
+                                            <option value="tannery">Tannery</option>
+                                            <option value="manufacturing">Manufacturing</option>
+                                            <option value="pharma">Pharmaceutical</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="industryDistance" class="block text-gray-600 text-sm font-medium mb-2">Distance from Industry (in meters)</label>
+                                    <input type="number" id="industryDistance" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-2" placeholder="e.g., 500">
+                                </div>
+                            </div>
+                        </section>
 
-        <!-- Result -->
-        <div id="predictionResultCard" class="mt-6 hidden bg-green-50 border border-green-200 p-4 rounded-lg">
-          <h3 class="font-semibold text-green-800">Predicted HMPI</h3>
-          <p class="text-2xl font-bold text-green-900" id="predictedHmpiValue">--</p>
-          <p class="text-sm text-green-700">Critical Factor: <span id="predictedCriticalFactor">--</span></p>
-        </div>
-      </section>
-    </main>
-  </div>
+                        <!-- CSV Upload -->
+                        <section>
+                             <h2 class="text-xl font-bold text-blue-800 border-b border-gray-200 pb-2">Batch Upload (CSV)</h2>
+                             <div class="mt-4">
+                                <label for="csv-file-input" class="block text-gray-600 text-sm font-medium mb-2">Upload Batch File</label>
+                                <input type="file" id="csv-file-input" accept=".csv" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                                <div id="csv-preview" class="mt-4 hidden overflow-x-auto">
+                                    <h3 class="text-lg font-semibold mb-2">CSV Preview</h3>
+                                    <table id="csv-preview-table" class="min-w-full text-sm text-left">
+                                        <thead id="csv-preview-thead" class="bg-gray-100"></thead>
+                                        <tbody id="csv-preview-tbody"></tbody>
+                                    </table>
+                                </div>
+                             </div>
+                        </section>
 
-  <script>
-    const latInput = document.getElementById("latitude");
-    const lonInput = document.getElementById("longitude");
-    const getLocationBtn = document.getElementById("getLocationBtn");
-    const predictBtn = document.getElementById("generatePredictionBtn");
-    const loader = document.getElementById("predictionLoader");
-    const resultCard = document.getElementById("predictionResultCard");
-    const resultValue = document.getElementById("predictedHmpiValue");
-    const resultFactor = document.getElementById("predictedCriticalFactor");
+                        <!-- Submit Button -->
+                         <div class="pt-4 border-t border-gray-200">
+                            <button type="submit" class="w-full text-white font-bold py-3 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 transition">
+                                Submit All Data
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
 
-    // Get user GPS location
-    getLocationBtn.addEventListener("click", () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(pos => {
-          latInput.value = pos.coords.latitude.toFixed(6);
-          lonInput.value = pos.coords.longitude.toFixed(6);
-        }, err => {
-          aler
+    <!-- Leaflet.js, PapaParse & App Logic -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="./assets/js/utils.js"></script>
+    <script src="./assets/js/csvupload.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const getGpsBtn = document.getElementById('getGpsBtn');
+            const longitudeInput = document.getElementById('longitude');
+            const latitudeInput = document.getElementById('latitude');
+            const industryRadioButtons = document.querySelectorAll('input[name="industryNearby"]');
+            const industryDetails = document.getElementById('industryDetails');
+            const dataEntryForm = document.getElementById('data-entry-form');
+            const calculateHmpiBtn = document.getElementById('calculate-hpi-btn');
+            const hmpiResultCard = document.getElementById('hpi-result-card');
+            const hmpiValueEl = document.getElementById('hpi-value');
+            const hmpiInterpretationEl = document.getElementById('hpi-interpretation');
+            let detailMap, regionalMap, detailMarker;
+
+            // Correct HPI parameters and standards (in µg/L)
+            const hpiStandards = { al: 200, as: 50, cd: 3, cr: 50, cu: 1500, fe: 300, pb: 10, hg: 1, mn: 300, mo: 70, ni: 20, zn: 15000 };
+            const metalFullNames = { al: "Aluminium", as: "Arsenic", cd: "Cadmium", cr: "Chromium", cu: "Copper", fe: "Iron", pb: "Lead", hg: "Mercury", mn: "Manganese", mo: "Molybdenum", ni: "Nickel", zn: "Zinc" };
+
+            // --- ML Prediction Elements and Logic ---
+            const generatePredictionBtn = document.getElementById('generate-prediction-btn');
+            const predictionLoader = document.getElementById('prediction-loader');
+            const predictionResultCard = document.getElementById('prediction-result-card');
+            const predictedHmpiValueEl = document.getElementById('predicted-hmpi-value');
+            const predictedCriticalFactorEl = document.getElementById('predicted-critical-factor');
+            const criticalFactors = ['Lead (Pb)', 'Arsenic (As)', 'Cadmium (Cd)', 'Chromium (Cr)', 'Mercury (Hg)'];
+
+            generatePredictionBtn.addEventListener('click', () => {
+                const lat = latitudeInput.value;
+                const lon = longitudeInput.value;
+
+                if (!lat || !lon) {
+                    alert('Please acquire a GPS location first before generating a prediction.');
+                    return;
+                }
+
+                predictionResultCard.classList.add('hidden');
+                predictionLoader.classList.remove('hidden');
+                generatePredictionBtn.disabled = true;
+
+                setTimeout(() => {
+                    const predictedValue = (Math.random() * (250 - 40) + 40).toFixed(2);
+                    const criticalFactor = criticalFactors[Math.floor(Math.random() * criticalFactors.length)];
+
+                    predictedHmpiValueEl.textContent = predictedValue;
+                    predictedCriticalFactorEl.textContent = criticalFactor;
+                    
+                    const analyticsData = generateMockAnalyticsData();
+                    if (window.RTWQMS && window.RTWQMS.utils) {
+                         window.RTWQMS.utils.storageSet('rtwqms_aggregate_data', analyticsData);
+                    } else {
+                        localStorage.setItem('rtwqms_aggregate_data', JSON.stringify(analyticsData));
+                    }
+                   
+                    predictionLoader.classList.add('hidden');
+                    predictionResultCard.classList.remove('hidden');
+                    generatePredictionBtn.disabled = false;
+                    
+                    setTimeout(() => {
+                        window.location.href = 'analytics.html';
+                    }, 1500);
+                }, 2000);
+            });
+
+            function generateMockAnalyticsData() {
+                const data = {
+                    dailyExceedances: {},
+                    turbidity: { x: [], y: [], meta: [] },
+                    dailyAvgParams: { Pb: [], Cr: [], As: [], turbidity: [], pH: [], DO: [] },
+                };
+
+                for (let i = 0; i < 90; i++) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    const dateString = date.toISOString().split('T')[0];
+                    if (Math.random() > 0.6) {
+                        data.dailyExceedances[dateString] = Math.floor(Math.random() * 5) + 1;
+                    }
+                    Object.keys(data.dailyAvgParams).forEach(param => {
+                        let avg;
+                        if (param === 'pH') {
+                            avg = (Math.random() * (8.5 - 6.5) + 6.5).toFixed(2);
+                        } else if (param === 'turbidity'){
+                            avg = (Math.random() * 30).toFixed(2);
+                        } else if (param === 'DO'){
+                            avg = (Math.random() * (10 - 4) + 4).toFixed(2);
+                        } else {
+                            avg = (Math.random() * 40).toFixed(2);
+                        }
+                        data.dailyAvgParams[param].push({ date: dateString, avg: parseFloat(avg) });
+                    });
+                }
+                 Object.keys(data.dailyAvgParams).forEach(param => {
+                    data.dailyAvgParams[param].reverse();
+                });
+
+                for (let i = 0; i < 100; i++) {
+                    const turbidity = Math.random() * 50;
+                    const doValue = 10 - (turbidity / 5) + (Math.random() * 2 - 1);
+                    data.turbidity.x.push(turbidity);
+                    data.turbidity.y.push(Math.max(2, doValue));
+                    data.turbidity.meta.push({
+                        station_name: `Station ${String.fromCharCode(65 + Math.floor(i/5))}`,
+                        hmpi: (Math.random() * 100).toFixed(2)
+                    });
+                }
+                return data;
+            }
+
+            function populateHmpiForm() {
+                const formContainer = document.getElementById('hpi-form');
+                if (!formContainer) return;
+                formContainer.innerHTML = '';
+                Object.keys(hpiStandards).forEach(metal => {
+                    formContainer.innerHTML += `
+                        <div>
+                            <label for="hpi-${metal}" class="block text-gray-600 text-sm font-medium mb-1">${metalFullNames[metal]} (${metal.toUpperCase()})</label>
+                            <input type="number" step="any" id="hpi-${metal}" name="hpi-${metal}" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="in µg/L">
+                        </div>`;
+                });
+            }
+
+            function calculateHPI() {
+                let sumQiWi = 0;
+                let sumWi = 0;
+                let metalCount = 0;
+
+                for (const metal in hpiStandards) {
+                    const concentrationInput = document.getElementById(`hpi-${metal}`);
+                    const Ci = parseFloat(concentrationInput.value);
+
+                    if (!isNaN(Ci) && Ci > 0) {
+                        const Si = hpiStandards[metal];
+                        const Wi = 1 / Si;
+                        const Qi = (Ci / Si) * 100;
+
+                        sumQiWi += Qi * Wi;
+                        sumWi += Wi;
+                        metalCount++;
+                    }
+                }
+
+                if (metalCount === 0) {
+                    return { hpiValue: null, error: "Please enter a concentration for at least one heavy metal." };
+                }
+                
+                const hpiValue = sumQiWi / sumWi;
+                return { hpiValue };
+            }
+            
+            function setupMaps() {
+                const initialCoords = [22.9734, 78.6569];
+                const tileUrl = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+                const attribution = '&copy; OpenStreetMap contributors &copy; CARTO';
+                detailMap = L.map('detailMap').setView(initialCoords, 10);
+                L.tileLayer(tileUrl, { attribution }).addTo(detailMap);
+                detailMarker = L.marker(initialCoords).addTo(detailMap);
+                regionalMap = L.map('regionalMap').setView([22.5937, 78.9629], 4.5);
+                L.tileLayer(tileUrl, { attribution }).addTo(regionalMap);
+
+                fetch('https://raw.githubusercontent.com/geohacker/india/master/state/india_state.geojson')
+                    .then(res => res.json())
+                    .then(data => L.geoJSON(data, {
+                        style: { color: "#1d4ed8", weight: 1.5, opacity: 0.8, fillColor: "#60a5fa", fillOpacity: 0.1 },
+                        onEachFeature: (feature, layer) => layer.on('click', e => {
+                            const center = e.target.getBounds().getCenter();
+                            detailMap.flyTo([center.lat, center.lng], 8);
+                            detailMarker.setLatLng([center.lat, center.lng]);
+                            latitudeInput.value = center.lat.toFixed(6);
+                            longitudeInput.value = center.lng.toFixed(6);
+                        }).bindPopup(feature.properties.NAME_1)
+                    }).addTo(regionalMap)).catch(err => console.error('Error loading GeoJSON:', err));
+            }
+
+            getGpsBtn.addEventListener('click', () => {
+                if (!navigator.geolocation) { alert("Geolocation is not supported."); return; }
+                getGpsBtn.disabled = true; getGpsBtn.innerHTML = '<span>Fetching...</span>';
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const { latitude, longitude } = pos.coords;
+                    latitudeInput.value = latitude.toFixed(6);
+                    longitudeInput.value = longitude.toFixed(6);
+                    detailMap.flyTo([latitude, longitude], 15);
+                    detailMarker.setLatLng([latitude, longitude]);
+                    getGpsBtn.innerHTML = `<span>Location Acquired</span>`;
+                    getGpsBtn.disabled = false;
+                }, err => {
+                    alert(`Error: ${err.message}`);
+                    getGpsBtn.innerHTML = '<span>Acquire Current Location</span>';
+                    getGpsBtn.disabled = false;
+                });
+            });
+            
+            industryRadioButtons.forEach(radio => radio.addEventListener('change', e => industryDetails.classList.toggle('hidden', e.target.value !== 'yes')));
+
+            calculateHmpiBtn.addEventListener('click', () => {
+                const result = calculateHPI(); 
+                
+                hmpiResultCard.classList.remove('hidden');
+                hmpiResultCard.className = 'mt-4 p-4 rounded-lg text-center text-white'; // Reset classes
+
+                if (result.error) {
+                    hmpiValueEl.textContent = "Error";
+                    hmpiInterpretationEl.textContent = result.error;
+                    hmpiResultCard.classList.add('bg-gray-500');
+                    return;
+                }
+
+                hmpiValueEl.textContent = result.hpiValue.toFixed(2);
+
+                if (result.hpiValue < 100) {
+                    hmpiInterpretationEl.textContent = 'Low Pollution (Suitable for drinking)';
+                    hmpiResultCard.classList.add('bg-green-600');
+                } else if (result.hpiValue >= 100 && result.hpiValue < 200) {
+                    hmpiInterpretationEl.textContent = 'Medium Pollution (May require treatment)';
+                    hmpiResultCard.classList.add('bg-orange-500');
+                } else {
+                    hmpiInterpretationEl.textContent = 'High Pollution (Unsuitable for drinking)';
+                    hmpiResultCard.classList.add('bg-red-600');
+                }
+            });
+
+            dataEntryForm.addEventListener('submit', e => {
+                e.preventDefault();
+                console.log('Form Data Submitted:', Object.fromEntries(new FormData(dataEntryForm).entries()));
+                alert('Data submitted successfully! (Check console for details)');
+                dataEntryForm.reset();
+                industryDetails.classList.add('hidden');
+                hmpiResultCard.classList.add('hidden');
+                predictionResultCard.classList.add('hidden');
+            });
+            
+            setupMaps();
+            populateHmpiForm();
+        });
+    </script>
+</body>
+</html>

@@ -1,9 +1,18 @@
 services:
   - type: web
-    name: rtwqms-backend
+    # A name for your service on Render
+    name: jalskti-app
+    # The environment for your application
     env: python
+    # Tells Render to run all commands from inside the 'backend' folder
+    rootDirectory: backend
+    # The sequence of commands to build your application
     buildCommand: |
+      # Installs system libraries needed by 'rasterio'
       apt-get update && apt-get install -y libgdal-dev --no-install-recommends
-      chmod -R a+r backend
-      pip install -r backend/requirements.txt
-    startCommand: gunicorn --chdir backend app:app
+      # Fixes the "Permission Denied" error by giving read access to all files
+      chmod -R a+r .
+      # Installs your Python packages
+      pip install -r requirements.txt
+    # The command to start your web server
+    startCommand: gunicorn app:app

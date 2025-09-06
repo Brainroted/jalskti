@@ -1,157 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Station Details - RTWQMS-Plus</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Station Details - RTWQMS-Plus</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <nav class="w-64 bg-white p-5 flex flex-col justify-between shadow-lg">
+      <div>
+        <div class="flex items-center space-x-4 mb-10">
+          <img src="{{ url_for('static', filename='img/cpcb_logo.png') }}" alt="CPCB Logo" class="h-12">
+          <span class="text-xl font-bold text-blue-800">RTWQMS+</span>
+        </div>
+        <ul>
+          <li class="mb-4"><a href="{{ url_for('route_dashboard') }}" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg">Dashboard</a></li>
+          <li class="mb-4"><a href="{{ url_for('route_station') }}?id=1" class="flex items-center p-3 bg-blue-100 rounded-lg text-blue-800 font-semibold">Stations</a></li>
+          <li class="mb-4"><a href="{{ url_for('route_analytics') }}" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg">Analytics</a></li>
+          <li class="mb-4"><a href="{{ url_for('route_admin') }}" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg">Admin</a></li>
+        </ul>
+      </div>
+      <a href="{{ url_for('route_index') }}" class="flex items-center p-3 hover:bg-red-50 text-red-600 rounded-lg">Logout</a>
+    </nav>
 
-    <div class="flex h-screen">
-        <!-- Sidebar Navigation -->
-        <nav class="w-64 bg-white p-5 flex flex-col justify-between shadow-lg">
-             <div>
-                <div class="flex items-center space-x-4 mb-10">
-                    <img src="./assets/img/cpcb_logo.png" alt="CPCB Logo" class="h-12">
-                    <span class="text-xl font-bold text-blue-800">RTWQMS+</span>
-                </div>
-                <ul>
-                    <li class="mb-4"><a href="dataentry.html" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"><svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>Dashboard</a></li>
-                    <li class="mb-4"><a href="station.html?id=1" class="flex items-center p-3 bg-blue-100 rounded-lg text-blue-800 font-semibold"><svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>Stations</a></li>
-                    <li class="mb-4"><a href="analytics.html" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"><svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>Analytics</a></li>
-                    <li class="mb-4"><a href="admin.html" class="flex items-center p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors"><svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0 -3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>Admin</a></li>
-                </ul>
+    <!-- Main -->
+    <main class="flex-1 p-6 lg:p-8 overflow-y-auto">
+      <header class="mb-6">
+        <div class="bg-white text-gray-800 shadow-md rounded-lg relative">
+          <div class="absolute top-0 left-0 w-full h-1 bg-orange-500 rounded-t-lg"></div>
+          <div class="absolute bottom-0 left-0 w-full h-1 bg-green-600 rounded-b-lg"></div>
+          <div class="flex items-center justify-between p-3">
+            <div class="flex items-center space-x-4">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India" class="h-16">
+              <div>
+                <h1 class="text-xl md:text-2xl font-bold text-indigo-900">जल गुणवत्ता निगरानी पोर्टल</h1>
+                <p class="text-base md:text-lg text-gray-700 font-medium">Water Quality Monitoring Portal</p>
+                <p class="text-sm md:text-md text-gray-600">Government of India</p>
+              </div>
             </div>
-             <a href="index.html" class="flex items-center p-3 hover:bg-red-50 text-red-600 rounded-lg transition-colors">
-                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                Logout
-            </a>
-        </nav>
-        
-        <!-- Main Content -->
-        <main class="flex-1 p-6 lg:p-8 overflow-y-auto">
-            <header class="mb-6">
-                <div class="bg-white text-gray-800 shadow-md rounded-lg relative">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-orange-500 rounded-t-lg"></div>
-                    <div class="absolute bottom-0 left-0 w-full h-1 bg-green-600 rounded-b-lg"></div>
-                    <div class="flex items-center justify-between p-3">
-                        <div class="flex items-center space-x-4">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India" class="h-16">
-                            <div>
-                                <h1 class="text-xl md:text-2xl font-bold text-indigo-900">जल गुणवत्ता निगरानी पोर्टल</h1>
-                                <p class="text-base md:text-lg text-gray-700 font-medium">Water Quality Monitoring Portal</p>
-                                <p class="text-sm md:text-md text-gray-600">Government of India</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-center">
-                            <img src="./assets/img/79_indp.png" alt="79th Independence Logo" class="h-20 md:h-24">
-                        </div>
-                    </div>
-                </div>
-            </header>
-            
-            <!-- Station-specific Header -->
-            <div id="station-header" class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-                <!-- Data will be populated by JS -->
+            <div class="flex items-center justify-center">
+              <img src="{{ url_for('static', filename='img/79_indp.png') }}" alt="79th Independence Logo" class="h-20 md:h-24">
             </div>
-            
-            <!-- Parameter Cards -->
-            <div id="parameter-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                 <!-- Data will be populated by JS -->
-            </div>
-            
-            <!-- Main Chart & Anomaly Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
-                    <h2 class="text-xl font-bold mb-4 text-blue-800">Time-Series Analysis: Turbidity</h2>
-                    <div id="plotly-chart" class="h-96"></div>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md">
-                    <h2 class="text-xl font-bold mb-4 text-blue-800">Anomaly Insights</h2>
-                    <div id="anomaly-box" class="bg-gray-100 p-4 rounded-lg h-64 overflow-y-auto text-gray-700">
-                        <p>A significant spike in turbidity was observed in late August 2025, exceeding the 95th percentile baseline. This may indicate an untreated industrial discharge or a significant runoff event following heavy rainfall.</p>
-                    </div>
-                    <div class="mt-4 flex space-x-4">
-                        <button class="flex-1 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-2 px-4 rounded-lg text-sm">Send Alert</button>
-                        <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg text-sm">Download Report</button>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
+          </div>
+        </div>
+      </header>
 
-    <!-- Plotly.js -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    
-    <!-- App Logic -->
-    <script src="./assets/js/utils.js"></script>
-    <script src="./assets/js/donut.js"></script>
-    <script src="./assets/js/charts.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const params = new URLSearchParams(window.location.search);
-            const stationId = params.get('id') || '1'; // Default to station 1 if no ID
+      <!-- Station-specific Header -->
+      <div id="station-header" class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8"></div>
 
-            const stations = await fetchData('./assets/data/stations.json');
-            const stationData = stations.find(s => s.id == stationId);
+      <!-- Parameter Cards -->
+      <div id="parameter-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"></div>
 
-            const allReadings = await fetchData('./assets/data/readings.json');
-            const stationReadings = allReadings[stationId];
+      <!-- Main Chart & Anomaly -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
+          <h2 class="text-xl font-bold mb-4 text-blue-800">Time-Series Analysis: Turbidity</h2>
+          <div id="plotly-chart" class="h-96"></div>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <h2 class="text-xl font-bold mb-4 text-blue-800">Anomaly Insights</h2>
+          <div id="anomaly-box" class="bg-gray-100 p-4 rounded-lg h-64 overflow-y-auto text-gray-700">
+            <p>A significant spike in turbidity was observed in late August 2025, exceeding the 95th percentile baseline. This may indicate an untreated industrial discharge or a significant runoff event following heavy rainfall.</p>
+          </div>
+          <div class="mt-4 flex space-x-4">
+            <button class="flex-1 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-2 px-4 rounded-lg text-sm">Send Alert</button>
+            <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg text-sm">Download Report</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 
-            if (!stationData) {
-                document.querySelector('main').innerHTML = '<h1 class="text-2xl text-red-500">Error: Station not found.</h1>';
-                return;
-            }
+  <!-- Plotly.js -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-            // Populate Header
-            const header = document.getElementById('station-header');
-            const healthColor = getHealthColor(stationData.sensor_health);
-            header.innerHTML = `
-                <div>
-                    <h1 class="text-3xl font-bold text-blue-900">${stationData.name}</h1>
-                    <p class="text-gray-600">River: ${stationData.river}</p>
-                    <p class="text-sm text-gray-500 mt-1">Last seen: ${new Date(stationData.last_seen).toLocaleString()}</p>
-                </div>
-                <div class="flex items-center space-x-4 mt-4 md:mt-0">
-                    <div class="w-24 h-24">
-                        ${createDonutChart(stationData.sensor_health)}
-                    </div>
-                    <div>
-                        <p class="text-lg font-semibold">Sensor Health</p>
-                        <p class="text-3xl font-bold" style="color: ${healthColor};">${(stationData.sensor_health * 100).toFixed(0)}%</p>
-                    </div>
-                </div>
-            `;
+  <!-- App Logic -->
+  <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/donut.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const params = new URLSearchParams(window.location.search);
+      const stationId = params.get('id') || '1';
 
-            // Populate Parameter Cards
-            const cardsContainer = document.getElementById('parameter-cards');
-            const parameters = stationData.latest_values;
-            const paramConfig = {
-                pH: { unit: '', icon: '<svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a8.5 8.5 0 11-12.856-12.856 8.5 8.5 0 0112.856 12.856zM12 21a9 9 0 100-18 9 9 0 000 18z"></path><path d="M12 18a6 6 0 100-12 6 6 0 000 12z"></path></svg>'},
-                DO: { unit: 'mg/L', icon: '<svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V8m10 8V8m-5 8V8"></path></svg>'},
-                turbidity: { unit: 'NTU', icon: '<svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>'},
-                conductivity: { unit: 'µS/cm', icon: '<svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>'}
-            };
-            cardsContainer.innerHTML = Object.keys(parameters).map(key => `
-                <div class="bg-white p-5 rounded-xl shadow-md flex items-center space-x-4">
-                    ${paramConfig[key].icon}
-                    <div>
-                        <p class="text-gray-600 capitalize">${key}</p>
-                        <p class="text-2xl font-bold">${parameters[key]} <span class="text-base font-normal">${paramConfig[key].unit}</span></p>
-                    </div>
-                </div>
-            `).join('');
+      const stations = await fetchData("{{ url_for('static', filename='data/stations.json') }}");
+      const stationData = stations.find(s => s.id == stationId);
 
-            // Render Chart
-            renderTimeSeriesChart('plotly-chart', stationReadings);
-        });
-    </script>
+      const allReadings = await fetchData("{{ url_for('static', filename='data/readings.json') }}");
+      const stationReadings = allReadings[stationId];
+
+      if (!stationData) {
+        document.querySelector('main').innerHTML = '<h1 class="text-2xl text-red-500">Error: Station not found.</h1>';
+        return;
+      }
+
+      // Populate Header
+      const header = document.getElementById('station-header');
+      const healthColor = getHealthColor(stationData.sensor_health);
+      header.innerHTML = `
+        <div>
+          <h1 class="text-3xl font-bold text-blue-900">${stationData.name}</h1>
+          <p class="text-gray-600">River: ${stationData.river}</p>
+          <p class="text-sm text-gray-500 mt-1">Last seen: ${new Date(stationData.last_seen).toLocaleString()}</p>
+        </div>
+        <div class="flex items-center space-x-4 mt-4 md:mt-0">
+          <div class="w-24 h-24">
+            ${createDonutChart(stationData.sensor_health)}
+          </div>
+          <div>
+            <p class="text-lg font-semibold">Sensor Health</p>
+            <p class="text-3xl font-bold" style="color: ${healthColor};">${(stationData.sensor_health * 100).toFixed(0)}%</p>
+          </div>
+        </div>
+      `;
+
+      // Parameter Cards
+      const cardsContainer = document.getElementById('parameter-cards');
+      const parameters = stationData.latest_values;
+      const paramConfig = {
+        pH: { unit: '', icon: '⚗️' },
+        DO: { unit: 'mg/L', icon: '💧' },
+        turbidity: { unit: 'NTU', icon: '🌊' },
+        conductivity: { unit: 'µS/cm', icon: '⚡' }
+      };
+      cardsContainer.innerHTML = Object.keys(parameters).map(key => `
+        <div class="bg-white p-5 rounded-xl shadow-md flex items-center space-x-4">
+          <span class="text-2xl">${paramConfig[key].icon}</span>
+          <div>
+            <p class="text-gray-600 capitalize">${key}</p>
+            <p class="text-2xl font-bold">${parameters[key]} <span class="text-base font-normal">${paramConfig[key].unit}</span></p>
+          </div>
+        </div>
+      `).join('');
+
+      renderTimeSeriesChart('plotly-chart', stationReadings);
+    });
+  </script>
 </body>
 </html>
-
-

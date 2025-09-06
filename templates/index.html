@@ -26,7 +26,6 @@
                         <p class="text-sm md:text-md text-gray-600">Government of India</p>
                     </div>
                 </div>
-                <!-- 79th Independence Logo on the right -->
                 <div class="flex items-center justify-center">
                     <img src="{{ url_for('static', filename='img/79_indp.png') }}" alt="79th Independence Logo" class="h-20 md:h-24">
                 </div>
@@ -43,26 +42,32 @@
                     <h1 class="text-3xl font-bold text-blue-800">Real time water quality monitoring system</h1>
                     <p class="text-orange-600 mt-2 font-semibold">For Government Officials Only</p>
                 </div>
-                <form id="login-form" onsubmit="return false;">
+                <form method="POST">
                     <div class="mb-4">
                         <label for="username" class="block text-gray-600 text-sm font-medium mb-2">Username</label>
-                        <input type="text" id="username" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., cpcb_official">
+                        <input type="text" name="username" id="username" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., cpcb_official">
                     </div>
                     <div class="mb-4">
                         <label for="password" class="block text-gray-600 text-sm font-medium mb-2">Password</label>
-                        <input type="password" id="password" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                        <input type="password" name="password" id="password" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
                     </div>
                     <div class="mb-6">
                         <label for="role" class="block text-gray-600 text-sm font-medium mb-2">Select Role</label>
-                        <select id="role" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select name="role" id="role" class="w-full bg-gray-100 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option>Government Official</option>
                             <option>Technician</option>
                             <option>Viewer</option>
                         </select>
                     </div>
-                    <button type="button" id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
+
+                    {% if error %}
+                        <p class="text-red-500 mt-2 text-center">{{ error }}</p>
+                    {% endif %}
+
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
                         Login
                     </button>
+
                     <div class="mt-4 text-center">
                         <a href="{{ url_for('route_dashboard') }}" class="inline-block w-full text-sm text-blue-600 hover:text-blue-500 bg-gray-200 hover:bg-gray-300 font-semibold py-3 px-4 rounded-lg transition duration-300">
                             Skip & View Demo
@@ -75,11 +80,5 @@
             </p>
         </div>
     </div>
-
-    <script>
-        document.getElementById('login-btn').addEventListener('click', function() {
-            window.location.href = "{{ url_for('route_dashboard') }}"; // Redirect to the dashboard
-        });
-    </script>
 </body>
 </html>

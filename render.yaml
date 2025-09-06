@@ -11,7 +11,7 @@ services:
       # Installs system libraries needed by 'rasterio'
       apt-get update && apt-get install -y libgdal-dev --no-install-recommends
       # Fixes the "Permission Denied" error by giving read access to all files
-      chmod -R a+r .
+      chmod -R 755 .
       # Installs your Python packages
       pip install -r requirements.txt
     # The command to start your web server

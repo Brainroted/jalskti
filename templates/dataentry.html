@@ -262,14 +262,55 @@
             const predictedCriticalFactorEl = document.getElementById('predicted-critical-factor');
             const criticalFactors = ['Lead (Pb)', 'Arsenic (As)', 'Cadmium (Cd)', 'Chromium (Cr)', 'Mercury (Hg)'];
 
-            generatePredictionBtn.addEventListener('click', () => {
-                const lat = latitudeInput.value;
-                const lon = longitudeInput.value;
+            generatePredictionBtn.addEventListener('click', async () => {
+    const lat = latitudeInput.value;
+    const lon = longitudeInput.value;
 
-                if (!lat || !lon) {
-                    alert('Please acquire a GPS location first before generating a prediction.');
-                    return;
-                }
+    if (!lat || !lon) {
+        alert('Please acquire a GPS location first before generating a prediction.');
+        return;
+    }
+
+    predictionResultCard.classList.add('hidden');
+    predictionLoader.classList.remove('hidden');
+    generatePredictionBtn.disabled = true;
+
+    try {
+        const response = await fetch('/api/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ latitude: parseFloat(lat), longitude: parseFloat(lon) })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}`);
+        }
+
+        const data = await response.json();
+        predictedHmpiValueEl.textContent = parseFloat(data.predicted_hmpi).toFixed(2);
+        // Optional: You can implement logic to determine critical factor from data
+        predictedCriticalFactorEl.textContent = "N/A";
+
+        const analyticsData = generateMockAnalyticsData(); // existing mock analytics
+        if (window.RTWQMS && window.RTWQMS.utils) {
+            window.RTWQMS.utils.storageSet('rtwqms_aggregate_data', analyticsData);
+        } else {
+            localStorage.setItem('rtwqms_aggregate_data', JSON.stringify(analyticsData));
+        }
+
+        predictionLoader.classList.add('hidden');
+        predictionResultCard.classList.remove('hidden');
+
+        setTimeout(() => { window.location.href = 'analytics.html'; }, 1500);
+    } catch (err) {
+        alert(`Prediction failed: ${err.message}`);
+        predictionLoader.classList.add('hidden');
+        generatePredictionBtn.disabled = false;
+    } finally {
+        generatePredictionBtn.disabled = false;
+    }
+});
+
 
                 predictionResultCard.classList.add('hidden');
                 predictionLoader.classList.remove('hidden');
